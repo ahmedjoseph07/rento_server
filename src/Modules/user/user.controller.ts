@@ -8,7 +8,7 @@ const getUsers = async (req: Request, res: Response) => {
         res.status(200).json({
             "success": true,
             "message": "Users retrieved successfully",
-            "data": result
+            "data": result.rows
         })
     } catch (err: any) {
         console.error(err)
@@ -43,7 +43,6 @@ const deleteUserById = async (req: Request, res: Response) => {
     const id = req.params.userId
     try {
         const result = await userServices.deleteUserById(id as string)
-        console.log("Controller", result)
         res.status(200).json({
             "success": true,
             "message": "User deleted successfully",
@@ -59,7 +58,6 @@ const deleteUserById = async (req: Request, res: Response) => {
         })
     }
 }
-
 
 export const userControllers = {
     getUsers,
