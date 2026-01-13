@@ -3,12 +3,19 @@ import initDB from "./config/db.js"
 import { authRoutes } from "./Modules/auth/auth.route.js"
 import { userRoutes } from "./Modules/user/user.route.js"
 import { vehicleRoutes } from "./Modules/vehicle/vehicle.route.js"
+import { bookingRoutes } from "./Modules/booking/booking.route.js"
 
 const app = express()
 
 app.use(express.json())
 
 initDB()
+
+// Home Route
+app.get('/', (req: Request, res: Response) => {
+    res.send("--Welcome to Rento Server--")
+})
+
 
 // --Auth Routes--
 app.use('/api/v1/auth', authRoutes)
@@ -17,13 +24,12 @@ app.use('/api/v1/auth', authRoutes)
 app.use('/api/v1/users', userRoutes)
 
 // Vehhicle Routes
+app.use('/api/v1/vehicles', vehicleRoutes)
 
-app.use('/api/v1/vehicles',vehicleRoutes)
+//Booking Routes
+app.use('/api/v1/bookings',bookingRoutes)
 
-app.get('/', (req: Request, res: Response) => {
-    res.send("--Welcome to Rento Server--")
-})
-
+// Not Found Route
 app.use((req: Request, res: Response) => {
     res.status(404).json({
         "success": false,
