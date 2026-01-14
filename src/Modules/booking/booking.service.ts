@@ -44,22 +44,106 @@ const createBooking = async (booking: Booking) => {
     return resultWithVehcileInfo
 }
 
-const getBookings = async () => {
-    const result = await pool.query(`
-        SELECT * FROM bookings
-        `)
-    return result
-}
+const getBookings = async (role: string, customerId: number) => {
+    if (role === "admin") {
+        const result = await pool.query(`
+      SELECT 
+        b.id,
+        b.customer_id,
+        b.vehicle_id,
+        b.rent_start_date,
+        b.rent_end_date,
+        b.total_price,
+        b.status,
+        u.name AS customer_name,
+        u.email AS customer_email,
+        v.vehicle_name,
+        v.registration_number
+      FROM bookings b
+      JOIN users u ON b.customer_id = u.id
+      JOIN vehicles v ON b.vehicle_id = v.id
+      ORDER BY b.id DESC;
+    `);
+
+        const formatted = result.rows.map((b) => ({
+            id: b.id,
+            customer_id: b.customer_id,
+            vehicle_id: b.vehicle_id,
+            rent_start_date: b.rent_start_date,
+            rent_end_date: b.rent_end_date,
+            total_price: Number(b.total_price),
+            status: b.status,
+            customer: {
+                name: b.customer_name,
+                email: b.customer_email,
+            },
+            vehicle: {
+                vehicle_name: b.vehicle_name,
+                registration_number: b.registration_number,
+            },
+        }));
+
+        return formatted;
+    } else {
+        const result = await pool.query(`
+      SELECT 
+        b.id,
+        b.vehicle_id,
+        b.rent_start_date,
+        b.rent_end_date,
+        b.total_price,
+        b.status,
+        v.vehicle_name,
+        v.registration_number,
+        v.type
+      FROM bookings b
+      JOIN vehicles v ON b.vehicle_id = v.id
+      WHERE b.customer_id = $1
+      ORDER BY b.id DESC;
+    `, [customerId]);
+
+        const formatted = result.rows.map((b) => ({
+            id: b.id,
+            vehicle_id: b.vehicle_id,
+            rent_start_date: b.rent_start_date,
+            rent_end_date: b.rent_end_date,
+            total_price: Number(b.total_price),
+            status: b.status,
+            vehicle: {
+                vehicle_name: b.vehicle_name,
+                registration_number: b.registration_number,
+                type: b.type,
+            },
+        }));
+
+        return formatted;
+    }
+};
 
 const updateBookingById = async (id: string, status: string) => {
-    const result = await pool.query(`
-        UPDATE bookings SET status=$1 WHERE id=$2 RETURNING *
-         `, [status,id])
-    return result
-}
+  const result = await pool.query(
+    `UPDATE bookings SET status = $1 WHERE id = $2 RETURNING *`,
+    [status, id]
+  );
+  return result;
+};
+
+const updateVehicleAvailability = async (vehicleId: number, status: string) => {
+  await pool.query(
+    `UPDATE vehicles SET availability_status = $1 WHERE id = $2`,
+    [status, vehicleId]
+  );
+};
+const getBookingById = async (id: string) => {
+  const result = await pool.query(`SELECT * FROM bookings WHERE id = $1`, [id]);
+  return result.rows[0];
+};
+
 
 export const bookingServices = {
     createBooking,
     getBookings,
-    updateBookingById
+    updateBookingById,
+    getBookingById,
+    updateVehicleAvailability
 }
