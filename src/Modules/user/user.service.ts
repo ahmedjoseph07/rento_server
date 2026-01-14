@@ -16,11 +16,19 @@ const getUsers = async () => {
 }
 
 const updateUserById = async (user: User, id: string) => {
-    const { name, email, phone, role } = user
-    const result = await pool.query(`
-        UPDATE users SET name=$1, email=$2, phone=$3, role=$4 WHERE id=$5
-        RETURNING *`, [name, email, phone, role, id])
-    return result
+    const { name, email, phone, role } = user;
+
+    const result = await pool.query(
+    `UPDATE users SET
+    name = COALESCE($1, name),
+    email = COALESCE($2, email),
+    phone = COALESCE($3, phone),
+    role = COALESCE($4, role) WHERE id = $5 RETURNING id, name, email, phone, role;
+    `,
+        [name || null, email || null, phone || null, role || null, id]
+    );
+
+    return result;
 }
 
 
@@ -28,12 +36,21 @@ const deleteUserById = async (id: string) => {
     const result = await pool.query(`
         DELETE FROM users WHERE id=$1 RETURNING *
         `, [id])
-        console.log("Service", result)
     return result
 }
+
+const checkActiveBookings = async (customerId: string) => {
+    const result = await pool.query(
+        `SELECT * FROM bookings WHERE customer_id = $1 AND status = 'active'`,
+        [parseInt(customerId)]
+    );
+    const count = result.rows.length;
+    return count;
+};
 
 export const userServices = {
     getUsers,
     updateUserById,
-    deleteUserById
+    deleteUserById,
+    checkActiveBookings
 }

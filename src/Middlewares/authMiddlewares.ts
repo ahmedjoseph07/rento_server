@@ -30,7 +30,6 @@ export const authenticateJWT = (req: AuthenticatedRequest, res: Response, next: 
     }
 }
 
-
 export const authorizeAdmin = (
     req: AuthenticatedRequest,
     res: Response,

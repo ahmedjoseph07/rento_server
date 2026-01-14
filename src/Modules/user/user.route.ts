@@ -5,7 +5,7 @@ import { authenticateJWT, authorizeAdmin } from "../../Middlewares/authMiddlewar
 const router = Router()
 
 router.get('/',authenticateJWT,authorizeAdmin, userControllers.getUsers)
-router.put('/:userId', userControllers.updateUserById)
-router.delete('/:userId',userControllers.deleteUserById)
+router.put('/:userId',authenticateJWT, userControllers.updateUserById)
+router.delete('/:userId',authenticateJWT,authorizeAdmin,userControllers.deleteUserById)
 
 export const userRoutes = router
