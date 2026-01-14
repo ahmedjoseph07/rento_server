@@ -23,6 +23,14 @@ const createVehicle = async (req: Request, res: Response) => {
 const getVehicles = async (req: Request, res: Response) => {
     try {
         const result = await vehicleServices.getVehicles()
+
+        if (result.rows.length === 0) {
+            res.status(200).json({
+                "success": true,
+                "message": "No vehicles found",
+                "data": []
+            })
+        }
         res.status(200).json({
             "success": true,
             "message": "Vehicles retrieved successfully",
@@ -60,7 +68,6 @@ const updateVehicleById = async (req: Request, res: Response) => {
     try {
         const id = req.params.vehicleId as string
         const result = await vehicleServices.updateVehicleById(req.body, id)
-        console.log("Controller", result)
         res.status(200).json({
             "success": true,
             "message": "Vehicle updated successfully",
@@ -78,11 +85,26 @@ const updateVehicleById = async (req: Request, res: Response) => {
 const deleteVehicleById = async (req: Request, res: Response) => {
     try {
         const id = req.params.vehicleId as string
+
+        const activeCount = await vehicleServices.checkActiveBookings(id)
+
+        if (activeCount > 0) {
+            return res.status(403).json({
+                success: false,
+                message: "Vehicle cannot be deleted because it has active bookings",
+            });
+        }
         const result = await vehicleServices.deleteVehicleById(id)
+        if (result.rowCount === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "No vehicle found with this ID",
+            });
+        }
+
         res.status(200).json({
             "success": true,
-            "message": "Vehicle updated successfully",
-            "data": result.rows[0]
+            "message": "Vehicle deleted successfully",
         })
     } catch (err: any) {
         res.status(500).json({

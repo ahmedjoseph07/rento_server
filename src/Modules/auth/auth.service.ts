@@ -8,7 +8,7 @@ const signupUser = async (payload: Record<string, unknown>) => {
 
     const hashedPassword = await bcrypt.hash(password as string, 10)
     const result = await pool.query(`
-        INSERT INTO users(name,email,password,phone,role) VALUES ($1,$2,$3,$4,$5) RETURNING * `, [name, email, hashedPassword, phone, role]
+        INSERT INTO users(name,email,password,phone,role) VALUES ($1,$2,$3,$4,$5) RETURNING id, name, email, phone, role `, [name, email, hashedPassword, phone, role]
     )
     return result
 }
@@ -30,13 +30,22 @@ const signinUser = async (email: string, password: string) => {
         return false
     }
 
-    const jwtSecret = config.jwt_secret as string
-    const token = jwt.sign(user, jwtSecret, { expiresIn: '7d' })
+    const safeUser = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+    }
 
-    return { token, user }
+    const jwtSecret = config.jwt_secret as string
+    const token = jwt.sign(safeUser, jwtSecret, { expiresIn: '7d' })
+
+    return { token, user: safeUser }
 }
 
 export const authServices = {
-    signupUser, 
+    signupUser,
     signinUser
 }
+

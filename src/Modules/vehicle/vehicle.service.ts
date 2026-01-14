@@ -37,7 +37,6 @@ const updateVehicleById = async (vehicle: Vehicle, id: string) => {
     const result = await pool.query(`
         UPDATE vehicles SET vehicle_name=$1, type=$2, registration_number=$3, daily_rent_price=$4, availability_status=$5 WHERE id=$6 RETURNING *
         `, [vehicle_name, type, registration_number, daily_rent_price, availability_status, id])
-    console.log(result)
     return result
 }
 
@@ -48,10 +47,20 @@ const deleteVehicleById = async (id: string) => {
     return result
 }
 
+const checkActiveBookings = async (vehicleId: string) => {
+  const result = await pool.query(
+    `SELECT * FROM bookings WHERE vehicle_id = $1 AND status = 'active'`,
+    [parseInt(vehicleId)]
+  );
+  const count = result.rows.length;
+  return count;
+};
+
 export const vehicleServices = {
     createVehicle,
     getVehicles,
     getVehicleById,
     updateVehicleById,
-    deleteVehicleById
+    deleteVehicleById,
+    checkActiveBookings
 }

@@ -10,7 +10,7 @@ interface User {
 
 const getUsers = async () => {
     const result = await pool.query(`
-        SELECT * from users
+        SELECT id,name,email,phone,role from users
         `)
     return result
 }
