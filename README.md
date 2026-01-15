@@ -9,7 +9,7 @@ A RESTful API for managing vehicle rentals built with Node.js, TypeScript, Expre
 
 ---
 ## Live Server Link
-[![Vercel](https://img.shields.io/badge/vercel-404D59?style=for-the-badge&logo=vercel&logoColor=white)](https://www.vercel.com/)
+[![Vercel](https://img.shields.io/badge/vercel-404D59?style=for-the-badge&logo=vercel&logoColor=white)](rentoserver.vercel.app/)
 ---
 
 ## Table of Contents
@@ -22,7 +22,6 @@ A RESTful API for managing vehicle rentals built with Node.js, TypeScript, Expre
 - [Database Setup](#-database-setup)
 - [Running the Application](#-running-the-application)
 - [Project Structure](#-project-structure)
-- [Deployment](#-deployment)
 - [Contributing](#-contributing)
 
 ---
@@ -300,13 +299,12 @@ npm start
 
 ```json
 {
-  "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+"scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npx tsx watch ./src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "lint": "eslint . --ext .ts",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "test": "jest"
+    "vercel-build": "tsc"
   }
 }
 ```
