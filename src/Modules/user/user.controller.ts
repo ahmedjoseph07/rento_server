@@ -5,7 +5,6 @@ import { AuthenticatedRequest } from "../../Middlewares/authMiddlewares.js";
 const getUsers = async (req: Request, res: Response) => {
     try {
         const result = await userServices.getUsers()
-        console.log(result)
         res.status(200).json({
             "success": true,
             "message": "Users retrieved successfully",

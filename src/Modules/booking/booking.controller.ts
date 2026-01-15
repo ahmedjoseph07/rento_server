@@ -5,7 +5,6 @@ import { AuthenticatedRequest } from "../../Middlewares/authMiddlewares.js";
 const createBooking = async (req: Request, res: Response) => {
     try {
         const result = await bookingServices.createBooking(req.body)
-        console.log(result)
         res.status(201).json({
             "success": true,
             "message": "Booking created successfully",
